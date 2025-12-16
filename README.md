@@ -1,4 +1,4 @@
-# Slime Tracker Rev02
+# UNCZ_Slime_tracker
 
 [English](#english) | [한국어](#한국어)
 
