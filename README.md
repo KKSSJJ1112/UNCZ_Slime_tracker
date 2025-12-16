@@ -7,7 +7,7 @@
 ## English
 
 ### Overview
-Custom SlimeVR tracker with optimized power circuit design for reduced ripple and noise.
+Custom SlimeVR tracker.
 
 ### Specifications
 | Item | Description |
@@ -18,7 +18,7 @@ Custom SlimeVR tracker with optimized power circuit design for reduced ripple an
 | PCB Size | ~80mm x 30mm |
 
 ### Features
-- **Optimized Power Circuit**: Minimized ripple and noise compared to standard designs
+- **Optimized Power Circuit**: Minimized ripple and noise compared
 - **Compact Form Factor**: Streamlined 2-layer PCB design
 - **Production Ready**: Includes JLCPCB manufacturing files
 
@@ -61,7 +61,7 @@ From bottom to top: immediately after boost converter, after LC filter, and befo
 ## 한국어
 
 ### 개요
-전원부 리플 및 노이즈 최소화를 달성한 커스텀 SlimeVR 트래커입니다.
+커스텀 SlimeVR 트래커입니다.
 
 ### 사양
 | 항목 | 내용 |
@@ -72,7 +72,7 @@ From bottom to top: immediately after boost converter, after LC filter, and befo
 | PCB 크기 | 약 80mm x 30mm |
 
 ### 특징
-- **전원부 최적화**: 기존 설계 대비 리플 및 노이즈 최소화
+- **전원부 최적화**: 리플 및 노이즈 최소화
 - **컴팩트 설계**: 2레이어 PCB 기반 간결한 설계
 - **양산 대응**: JLCPCB 제조 파일 포함
 
