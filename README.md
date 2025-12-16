@@ -103,6 +103,7 @@ JLCPCB 기준 제조 파일 제공:
 <img width="920" height="385" alt="123" src="https://github.com/user-attachments/assets/1772d7f2-df50-49fa-b9a6-4c577bdee4aa" />
 
 <오실로 스코프 파형 측정중 정전기로 인한 칩 고장으로 기기 자체 인쇄 사진이 없음>
+
 맨 아래부터 승압 직후, LC필터 이후, 최종 imu공급 직전
 
 
