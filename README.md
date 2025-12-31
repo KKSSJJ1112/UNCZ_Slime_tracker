@@ -43,8 +43,10 @@ Production files are optimized for JLCPCB:
 
 ### Power Circuit Comparison
 <!-- Add your oscilloscope comparison images here -->
-<img width="920" height="385" alt="123" src="https://github.com/user-attachments/assets/0897828c-4a38-4b5a-b08d-046792c03588" />
-<Due to chip failure caused by static electricity during oscilloscope waveform measurement, no photos of the actual printed device are available.>
+![1--00223](https://github.com/user-attachments/assets/24b56b34-5e61-405f-a5ba-8eeab0566f58)
+
+77mv -> 20mv
+
 From bottom to top: immediately after boost converter, after LC filter, and before final IMU power supply.
 
 ### License
@@ -53,7 +55,7 @@ From bottom to top: immediately after boost converter, after LC filter, and befo
 
 
 ### Revision History
-- **Rev02** (Current): Power circuit optimization, noise reduction
+- **Rev02** (Current): Power circuit, Charging circuit changed
 - **Rev01**: Initial design
 
 ---
@@ -100,9 +102,9 @@ JLCPCB 기준 제조 파일 제공:
 #### 전원부 비교
 <!-- 오실로스코프 비교 이미지 추가 예정 -->
 
-<img width="920" height="385" alt="123" src="https://github.com/user-attachments/assets/1772d7f2-df50-49fa-b9a6-4c577bdee4aa" />
+![1--00223](https://github.com/user-attachments/assets/fc0c8e6a-ac11-4927-b0a2-3f2ecc8b9dd7)
 
-<오실로 스코프 파형 측정중 정전기로 인한 칩 고장으로 기기 자체 인쇄 사진이 없음>
+77mv -> 20mv 
 
 맨 아래부터 승압 직후, LC필터 이후, 최종 imu공급 직전
 
@@ -113,7 +115,7 @@ JLCPCB 기준 제조 파일 제공:
 
 
 ### 변경 이력
-- **Rev02** (현재): 전원부 최적화, 노이즈 저감
+- **Rev02** (현재): 전원부, 충전부 수정
 - **Rev01**: 최초 설계
 
 ---
