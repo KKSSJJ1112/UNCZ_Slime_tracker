@@ -110,7 +110,8 @@ From bottom to top: immediately after boost converter, after LC filter, and befo
 - Documentation: [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
 
 ### Revision History
-- **Rev02** (Current): Power circuit, Charging circuit changed
+- **Rev03** (In Progress): Restructured power line routing and added TVS diode for ESD protection, added selectable resistor pads for I2C/SPI configuration, changed power control to EN/CE pin-based switching.
+- **Rev02**: Power circuit, Charging circuit changed
 - **Rev01**: Initial design
 
 ---
@@ -217,7 +218,8 @@ SlimeVR 공식 오픈소스 펌웨어를 기반으로 합니다.
 - Documentation: [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
 
 ### 변경 이력
-- **Rev02** (현재): 전원부, 충전부 수정
+- **Rev03** (현재 진행중) : ESD관련한 배선 구조 변경 및 소자 추가, I2C, SPI 혼용을 위한 선택용 저항 패턴 추가, 전원제어를 EN, CE핀 기반으로 변경
+- **Rev02**: 전원부, 충전부 수정
 - **Rev01**: 최초 설계
 
 ---
