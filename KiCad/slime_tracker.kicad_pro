@@ -528,7 +528,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "../TYPE3/gbr/",
+      "plot": "gbr/",
       "pos_files": "../TYPE3/pos/",
       "specctra_dsn": "",
       "step": "",
