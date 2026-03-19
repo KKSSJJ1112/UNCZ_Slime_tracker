@@ -21,6 +21,8 @@ Custom SlimeVR tracker.
 | Battery | 1100mAh Li-Po |
 | PCB Size | ~80mm x 30mm |
 
+## REV01
+<details>
 ### Features
 - **Optimized Power Circuit**: Minimized ripple and noise (77mV → 20mV)
 - **Compact Form Factor**: Streamlined 2-layer PCB design
@@ -104,6 +106,7 @@ Edit the following files and replace WiFi credentials:
 
 77mV → 20mV  
 From bottom to top: immediately after boost converter, after LC filter, and before final IMU power supply.
+</details>
 
 ### License
 - Hardware (PCB, Schematics, 3D files): [MIT License](License/MIT)
@@ -129,6 +132,8 @@ From bottom to top: immediately after boost converter, after LC filter, and befo
 | 배터리 | 1100mAh Li-Po |
 | PCB 크기 | 약 80mm x 30mm |
 
+## REV01
+<details>
 ### 특징
 - **전원부 최적화**: 리플 및 노이즈 최소화 (77mV → 20mV)
 - **컴팩트 설계**: 2레이어 PCB 기반 간결한 설계
@@ -212,7 +217,7 @@ SlimeVR 공식 오픈소스 펌웨어를 기반으로 합니다.
 
 77mV → 20mV  
 맨 아래부터 승압 직후, LC필터 이후, 최종 IMU 공급 직전
-
+</details>
 ### 라이선스
 - Hardware (PCB, Schematics, 3D files): [MIT License](License/MIT)
 - Documentation: [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
