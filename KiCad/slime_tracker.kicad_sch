@@ -8121,7 +8121,7 @@
 		(at 331.47 154.94 180)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(dnp yes)
 		(uuid "01d94aa0-bd17-4427-b97f-ba3c780db878")
@@ -8209,7 +8209,7 @@
 				)
 			)
 		)
-		(property "Footprint" "slime:FXL0420"
+		(property "Footprint" "slime:FNR5020S3R0NT"
 			(at 273.05 78.74 0)
 			(effects
 				(font
@@ -8522,7 +8522,7 @@
 		(exclude_from_sim no)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "0b40dca7-3dab-4ca8-956f-5243bf6d6a92")
 		(property "Reference" "SW1"
@@ -10121,7 +10121,7 @@
 		(at 341.63 154.94 180)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(dnp yes)
 		(uuid "5624b3f9-ab39-4fd5-9419-988cbf404bdd")
@@ -10683,7 +10683,7 @@
 		(exclude_from_sim no)
 		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(uuid "69de09f7-d867-43d3-86b4-87b8a3c4f78a")
 		(property "Reference" "J1"
 			(at 215.392 87.376 0)
@@ -12634,7 +12634,7 @@
 		(at 350.52 154.94 180)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
 		(dnp yes)
 		(uuid "b070cfea-3d18-4142-a787-dca45d61ff3f")
@@ -13049,9 +13049,9 @@
 		(at 327.66 168.91 0)
 		(unit 1)
 		(exclude_from_sim no)
-		(in_bom yes)
+		(in_bom no)
 		(on_board yes)
-		(dnp no)
+		(dnp yes)
 		(fields_autoplaced yes)
 		(uuid "be05fc80-4750-4181-9759-780021e43292")
 		(property "Reference" "J2"
