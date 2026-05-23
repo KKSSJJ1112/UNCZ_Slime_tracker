@@ -1,230 +1,237 @@
-
-
-![asd](https://github.com/user-attachments/assets/8228291a-ee7a-49d2-be5c-5b5ca0e44572)
-
-# UNCZ_Slime_tracker
-
-[English](#english) | [한국어](#한국어)
+<h1 align="center">🚧 개발중 / 開発中 / Under Development 🚧</h1>
 
 ---
 
-## English
+# UNCZ SlimeVR Tracker
 
-### Overview
-Custom SlimeVR tracker.
+[🇯🇵 日本語](#日本語) | [🇰🇷 한국어](#한국어) | [🇺🇸 English](#english)
 
-### Specifications
-| Item | Description |
-|------|-------------|
-| MCU | ESP32-C3 Super Mini |
-| IMU | SlimeVR Mumo Breakout Module V1 (ICM-45686 + QMC6309) |
-| Battery | 1100mAh Li-Po |
-| PCB Size | ~80mm x 30mm |
+<p align="center">
+  <!-- 実演GIF / 실연 GIF / Demo GIF -->
+  <img src="pic/demo.gif" alt="Demo" width="600"/>
+</p>
 
-## REV01
-<details>
-### Features
-- **Optimized Power Circuit**: Minimized ripple and noise (77mV → 20mV)
-- **Compact Form Factor**: Streamlined 2-layer PCB design
-- **Production Ready**: Includes JLCPCB manufacturing files
+---
 
-### Repository Structure
-```
-├── 3D/                    # 3D model files (STL - case, mount, etc.)
-├── Datasheets/            # Component datasheets
-├── Demonstration_Video/   # Demo videos
-├── SlimeVR/               # SlimeVR firmware source code
-├── KiCad/                 # KiCad project files
-│   ├── *.kicad_pcb
-│   ├── *.kicad_sch
-│   └── *.kicad_pro
-├── License/               # License files
-├── Measurement_Pic/       # Power circuit ripple measurement photos
-└── Production/            # Manufacturing files
-    ├── BOM.csv            # Bill of Materials (JLCPCB format)
-    └── Positions.csv      # Pick and place file
-```
+## 日本語
 
-### Manufacturing
-Production files are optimized for JLCPCB:
-1. Generate Gerber and drill files from KiCad project (`KiCad/` folder)
-2. Upload generated Gerber files to JLCPCB
-3. Use provided BOM and position files for SMT assembly
+### 1. 概要
 
-### Firmware
+UNCZ SlimeVR Tracker は SlimeVR エコシステム互換のカスタム IMU トラッカーボードである。ESP32-C3 を中心に IMU・磁気センサ・バッテリー充電・昇降圧 DC-DC を 1 枚に統合し、USB-C 1 ポートで充電とファームウェア書き込みを兼ねる構成となっている。
 
-Based on the official SlimeVR open-source firmware.  
-Original repository: https://github.com/SlimeVR/SlimeVR-Tracker-ESP
+- ボードサイズ: **約 50mm × 35mm**
+- 電源: 1 セル Li-ion / Li-Po **1100mAh**
+- 通信: Wi-Fi (ESP32-C3 内蔵)
+- 充電/通信: USB-C 単一ポート
+- 4 層 PCB 設計
 
-This repository contains only the modified files. Clone the original repository first, then apply these changes.
+### 2. 使用 IC 一覧
 
-#### Modified Files
+| 役割 | 型番 | 主な仕様 |
+|------|------|----------|
+| MCU | ESP32-C3-MINI-1-H4X | RISC-V, Wi-Fi/BLE, 内蔵アンテナ |
+| 昇降圧 DC-DC | TPS63802DSGR | Iq 11µA, EN ピン制御 |
+| 充電 IC | BQ24232HRGTR | パワーパス内蔵, OVP 28V |
+| IMU | LSM6DSV16XTR | 6 軸, I²C 0x6B |
+| 磁気センサ | QMC6309 | 3 軸, I²C 0x7C (オプション実装) |
+| USB データ TVS | USBLC6-2SC6 | D+/D- ESD 保護 |
+| バッテリー | 1100mAh 1S Li-ion/Li-Po | 公称 3.7V |
 
-| File | Changes |
-|------|---------|
-| `src/defines.h` | Hardcoded WiFi credentials, battery monitoring disabled, dual sensor config (`SENSOR_DESC_LIST` - 0x69, 0x68), SDO pin control (`PIN_IMU_SDO = 5`) |
-| `src/main.cpp` | SDO pin initialization (GPIO5 → HIGH, 200ms delay), WiFi credentials fallback |
-| `src/network/wifihandler.cpp` | Hardcoded WiFi credentials (`tryHardcodedCredentials()` function) |
-| `src/network/wifihandler.h` | WiFi timeout reduced: 11s → 4s |
-| `src/sensors/softfusion/drivers/icm45base.h` | Default I2C address changed: 0x68 → 0x69 |
-| `board-defaults.json` | `BOARD_LOLIN_C3_MINI` dual sensor config (Sensor 0: 0x69, Sensor 1: 0x68) |
-| `platformio.ini` | Upload flags adjusted (`--after=no_reset`) |
+### 3. 出力 CLC フィルタ
 
-#### Key Features
-- ✅ Dual sensor support (I2C address 0x68 + 0x69)
-- ✅ Dynamic SDO pin control (GPIO5 for address separation)
-- ✅ Improved WiFi stability (timeout adjustment, multiple fallback)
-- ✅ Battery monitoring disabled
+TPS63802 の出力リップル抑制のため、共振周波数 **約 1.4MHz** をターゲットとした CLC フィルタを実装している。
 
-#### Dual Sensor Setup
-When using 2 sensors, **short the INT pin of the secondary tracker to GND**.
+**フィルタ構成**
+- C1 (前段): **10µF**
+- L: **1µH**
+- C2 (後段): **10µF**
+- 共振周波数: f₀ = 1 / (2π√(LC)) ≈ 1.59MHz (C 並列換算)
 
-#### Build & Flash
-1. Install PlatformIO
-2. Open `SlimeVR/` folder in VSCode
-3. Build and upload to ESP32-C3
+**スナバ・ダンピング**
+LC 共振による Q 値スパイクを抑えるため、後段に並列スナバを配置。
+- ダンピング抵抗: **1Ω 抵抗 × 3 個並列 = 0.33Ω**
+- スナバ容量: **22µF × 3 個並列 = 66µF**
 
-#### WiFi Configuration
-Edit the following files and replace WiFi credentials:
+この構成によりフィルタの Q 値を適切に下げ、過渡応答時のリンギングを抑制している。
 
-1. **src/defines.h** (Line 13, 18)
-   - Change `WIFI_CREDS_SSID` to your WiFi SSID
-   - Change `WIFI_CREDS_PASSWD` to your WiFi password
+<p align="center">
+  <!-- LTspice シミュレーション画像 -->
+  <img src="pic/ltspice_simulation.png" alt="LTspice Simulation" width="600"/>
+</p>
 
-2. **src/main.cpp** (Line 104, 105)
-   - Change `WIFI_CREDS_SSID` to your WiFi SSID  
-   - Change `WIFI_CREDS_PASSWD` to your WiFi password
+### 4. ファイル構成
 
-3. **src/network/wifihandler.cpp** (Line 310, 311)
-   - Change `HARDCODED_SSID` to your WiFi SSID
-   - Change `HARDCODED_PASSWD` to your WiFi password
+| フォルダ | 内容 |
+|----------|------|
+| `pic/` | 測定写真、実演 GIF |
+| `EASY_EDA_PRO/` | EasyEDA Pro プロジェクトファイル、ライブラリファイル |
+| `JLC_PCB/` | ガーバーファイル、BOM、Pick & Place ファイル |
+| `Datasheet/` | 使用部品のデータシート |
+| `Firmware/` | SlimeVR オープンソースベースのファームウェア |
+| `License/` | ライセンスファイル |
 
-**Note:** All three locations must match for reliable WiFi connection.
+### 5. ファームウェア
 
-### Power Circuit Measurement
-![Power Circuit Comparison](Measurement_Pic/ripple_comparison.jpg)
+本プロジェクトのファームウェアに関するすべての部分は **[SlimeVR オープンソースプロジェクト](https://github.com/SlimeVR/SlimeVR-Tracker-ESP)** に準拠する。
 
-77mV → 20mV  
-From bottom to top: immediately after boost converter, after LC filter, and before final IMU power supply.
-</details>
+### 6. リビジョン履歴
 
-### License
-- Hardware (PCB, Schematics, 3D files): [MIT License](License/MIT)
-- Documentation: [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+| Rev | 内容 |
+|-----|------|
+| REV1 | モジュールベースの拡張ボード設計 |
+| REV5 | チップベースの再設計 (現行) |
 
-### Revision History
-- **Rev03** (In Progress): Restructured power line routing and added TVS diode for ESD protection, added selectable resistor pads for I2C/SPI configuration, changed power control to EN/CE pin-based switching.
-- **Rev02**: Power circuit, Charging circuit changed
-- **Rev01**: Initial design
+### 7. ライセンス
+
+- **ハードウェア (PCB, 回路図, 3D ファイル)**: [MIT License](https://github.com/KKSSJJ1112/UNCZ_Slime_tracker/blob/main/License/MIT)
+- **ドキュメント**: [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
 
 ---
 
 ## 한국어
 
-### 개요
-커스텀 SlimeVR 트래커입니다.
+### 1. 개요
 
-### 사양
-| 항목 | 내용 |
+UNCZ SlimeVR Tracker는 SlimeVR 생태계와 호환되는 커스텀 IMU 트래커 보드입니다. ESP32-C3를 중심으로 IMU, 자력계, 배터리 충전 회로, 벅부스트 DC-DC를 한 장의 PCB에 통합했으며, 단일 USB-C 포트로 충전과 펌웨어 장입을 모두 처리합니다.
+
+- 보드 사이즈: **약 50mm × 35mm**
+- 전원: 1셀 Li-ion / Li-Po **1100mAh**
+- 통신: Wi-Fi (ESP32-C3 내장)
+- 충전/통신: USB-C 단일 포트
+- 4레이어 PCB 설계
+
+### 2. 사용 IC 목록
+
+| 역할 | 부품 | 주요 사양 |
+|------|------|-----------|
+| MCU | ESP32-C3-MINI-1-H4X | RISC-V, Wi-Fi/BLE, 내장 안테나 |
+| 벅부스트 DC-DC | TPS63802DSGR | Iq 11µA, EN 핀 제어 |
+| 충전 IC | BQ24232HRGTR | 파워패스 내장, OVP 28V |
+| IMU | LSM6DSV16XTR | 6축, I²C 0x6B |
+| 자력계 | QMC6309 | 3축, I²C 0x7C (옵션 실장) |
+| USB 데이터 TVS | USBLC6-2SC6 | D+/D- ESD 보호 |
+| 배터리 | 1100mAh 1S Li-ion/Li-Po | 공칭 3.7V |
+
+### 3. 출력 CLC 필터
+
+TPS63802 출력 리플 억제를 위해 공진 주파수 **약 1.4MHz**를 타겟으로 한 CLC 필터를 구성했습니다.
+
+**필터 구성**
+- C1 (전단): **10µF**
+- L: **1µH**
+- C2 (후단): **10µF**
+- 공진 주파수: f₀ = 1 / (2π√(LC)) ≈ 1.59MHz (C 병렬 환산)
+
+**스너버 댐핑**
+LC 공진으로 인한 Q값 스파이크를 억제하기 위해 후단에 병렬 스너버를 배치하여 의도적으로 Q값을 조정했습니다.
+- 댐핑 저항: **1Ω 저항 3개 병렬 = 0.33Ω**
+- 스너버 커패시터: **22µF 3개 병렬 = 66µF**
+
+이 구성으로 필터의 Q값을 적절히 낮춰 과도 응답 시 링잉을 억제합니다.
+
+<p align="center">
+  <!-- LTspice 시뮬레이션 이미지 -->
+  <img src="pic/ltspice_simulation.png" alt="LTspice Simulation" width="600"/>
+</p>
+
+### 4. 파일 구성
+
+| 폴더 | 내용 |
 |------|------|
-| MCU | ESP32-C3 Super Mini |
-| IMU | SlimeVR Mumo Breakout Module V1 (ICM-45686 + QMC6309) |
-| 배터리 | 1100mAh Li-Po |
-| PCB 크기 | 약 80mm x 30mm |
+| `pic/` | 측정 사진, 실연 GIF |
+| `EASY_EDA_PRO/` | EasyEDA Pro 프로젝트 파일, 라이브러리 파일 |
+| `JLC_PCB/` | 거버 파일, BOM, Pick & Place 파일 |
+| `Datasheet/` | 사용 부품 데이터시트 |
+| `Firmware/` | SlimeVR 오픈소스 기반 펌웨어 |
+| `License/` | 라이센스 파일 |
 
-## REV01
-<details>
-### 특징
-- **전원부 최적화**: 리플 및 노이즈 최소화 (77mV → 20mV)
-- **컴팩트 설계**: 2레이어 PCB 기반 간결한 설계
-- **양산 대응**: JLCPCB 제조 파일 포함
+### 5. 펌웨어
 
-### 저장소 구조
-```
-├── 3D/                    # 3D 모델 파일 (STL - 케이스, 마운트 등)
-├── Datasheets/            # 부품 데이터시트
-├── Demonstration_Video/   # 시연 영상
-├── SlimeVR/               # SlimeVR 펌웨어 소스 코드
-├── KiCad/                 # KiCad 프로젝트 파일
-│   ├── *.kicad_pcb
-│   ├── *.kicad_sch
-│   └── *.kicad_pro
-├── License/               # 라이선스 파일
-├── Measurement_Pic/       # 전원부 리플 측정 사진
-└── Production/            # 제조용 파일
-    ├── BOM.csv            # 부품 목록 (JLCPCB 형식)
-    └── Positions.csv      # 부품 배치 파일
-```
+본 프로젝트의 펌웨어와 관련된 모든 부분은 **[SlimeVR 오픈소스 프로젝트](https://github.com/SlimeVR/SlimeVR-Tracker-ESP)** 를 따릅니다.
 
-### 제조 방법
-JLCPCB 기준 제조 파일 제공:
-1. KiCad 프로젝트(`KiCad/` 폴더)에서 Gerber 및 드릴 파일 생성
-2. 생성된 Gerber 파일을 JLCPCB에 업로드
-3. 제공된 BOM 및 위치 파일로 SMT 조립 주문
+### 6. 리비전 히스토리
 
-### 펌웨어
+| Rev | 내용 |
+|-----|------|
+| REV1 | 모듈 기반의 확장 보드 설계 |
+| REV5 | 칩 기반의 재설계 (현행) |
 
-SlimeVR 공식 오픈소스 펌웨어를 기반으로 합니다.  
-원본 저장소: https://github.com/SlimeVR/SlimeVR-Tracker-ESP
+### 7. 라이센스
 
-이 저장소에는 수정된 파일만 포함되어 있습니다. 원본 저장소를 먼저 클론한 후 변경사항을 적용하세요.
-
-#### 수정된 파일
-
-| 파일 | 변경 내용 |
-|------|----------|
-| `src/defines.h` | WiFi 정보 하드코딩, 배터리 모니터링 비활성화, 듀얼 센서 설정 (`SENSOR_DESC_LIST` - 0x69, 0x68), SDO 핀 제어 (`PIN_IMU_SDO = 5`) |
-| `src/main.cpp` | SDO 핀 초기화 (GPIO5 → HIGH, 200ms delay), WiFi credentials fallback |
-| `src/network/wifihandler.cpp` | WiFi 정보 하드코딩 (`tryHardcodedCredentials()` 함수) |
-| `src/network/wifihandler.h` | WiFi 타임아웃 단축: 11초 → 4초 |
-| `src/sensors/softfusion/drivers/icm45base.h` | I2C 기본 주소 변경: 0x68 → 0x69 |
-| `board-defaults.json` | `BOARD_LOLIN_C3_MINI` 듀얼 센서 설정 (Sensor 0: 0x69, Sensor 1: 0x68) |
-| `platformio.ini` | 업로드 플래그 조정 (`--after=no_reset`) |
-
-#### 핵심 기능
-- ✅ 듀얼 센서 지원 (I2C 주소 0x68 + 0x69)
-- ✅ SDO 핀 동적 제어 (GPIO5로 센서 주소 분리)
-- ✅ WiFi 안정성 개선 (타임아웃 조정, 다중 fallback)
-- ✅ 배터리 모니터링 비활성화
-
-#### 듀얼 센서 사용 시
-센서 2개 사용 시, **보조 트래커의 INT 핀을 GND에 쇼트**시켜 사용하세요.
-
-#### 빌드 및 업로드
-1. PlatformIO 설치
-2. VSCode에서 `SlimeVR/` 폴더 열기
-3. ESP32-C3에 빌드 및 업로드
-
-#### WiFi 설정
-아래 파일들에서 WiFi 정보를 수정하세요:
-
-1. **src/defines.h** (13, 18번째 줄)
-   - `WIFI_CREDS_SSID`를 본인의 WiFi SSID로 변경
-   - `WIFI_CREDS_PASSWD`를 본인의 WiFi 비밀번호로 변경
-
-2. **src/main.cpp** (104, 105번째 줄)
-   - `WIFI_CREDS_SSID`를 본인의 WiFi SSID로 변경
-   - `WIFI_CREDS_PASSWD`를 본인의 WiFi 비밀번호로 변경
-
-3. **src/network/wifihandler.cpp** (310, 311번째 줄)
-   - `HARDCODED_SSID`를 본인의 WiFi SSID로 변경
-   - `HARDCODED_PASSWD`를 본인의 WiFi 비밀번호로 변경
-
-**참고:** 세 곳 모두 동일하게 설정해야 WiFi 연결이 정상 작동합니다.
-
-### 전원부 측정
-![전원부 비교](Measurement_Pic/ripple_comparison.jpg)
-
-77mV → 20mV  
-맨 아래부터 승압 직후, LC필터 이후, 최종 IMU 공급 직전
-</details>
-### 라이선스
-- Hardware (PCB, Schematics, 3D files): [MIT License](License/MIT)
-- Documentation: [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
-
-### 변경 이력
-- **Rev03** (현재 진행중) : ESD관련한 배선 구조 변경 및 소자 추가, I2C, SPI 혼용을 위한 선택용 저항 패턴 추가, 전원제어를 EN, CE핀 기반으로 변경
-- **Rev02**: 전원부, 충전부 수정
-- **Rev01**: 최초 설계
+- **하드웨어 (PCB, 회로도, 3D 파일)**: [MIT License](https://github.com/KKSSJJ1112/UNCZ_Slime_tracker/blob/main/License/MIT)
+- **문서**: [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
 
 ---
+
+## English
+
+### 1. Overview
+
+The UNCZ SlimeVR Tracker is a custom IMU tracker board compatible with the SlimeVR ecosystem. Built around the ESP32-C3, it integrates an IMU, magnetometer, battery charger, and buck-boost DC-DC converter onto a single PCB, with a single USB-C port handling both charging and firmware upload.
+
+- Board size: **~50mm × 35mm**
+- Power: 1-cell Li-ion / Li-Po **1100mAh**
+- Communication: Wi-Fi (ESP32-C3 built-in)
+- Charging/Communication: Single USB-C port
+- 4-layer PCB design
+
+### 2. IC List
+
+| Role | Part | Key Specs |
+|------|------|-----------|
+| MCU | ESP32-C3-MINI-1-H4X | RISC-V, Wi-Fi/BLE, built-in antenna |
+| Buck-Boost DC-DC | TPS63802DSGR | Iq 11µA, EN pin control |
+| Charger IC | BQ24232HRGTR | Power path built-in, OVP 28V |
+| IMU | LSM6DSV16XTR | 6-axis, I²C 0x6B |
+| Magnetometer | QMC6309 | 3-axis, I²C 0x7C (optional) |
+| USB Data TVS | USBLC6-2SC6 | D+/D- ESD protection |
+| Battery | 1100mAh 1S Li-ion/Li-Po | Nominal 3.7V |
+
+### 3. Output CLC Filter
+
+A CLC filter targeting a resonant frequency of **~1.4MHz** is implemented to suppress output ripple from the TPS63802.
+
+**Filter Configuration**
+- C1 (front): **10µF**
+- L: **1µH**
+- C2 (rear): **10µF**
+- Resonant frequency: f₀ = 1 / (2π√(LC)) ≈ 1.59MHz (with parallel C)
+
+**Snubber Damping**
+To suppress the Q-factor spike caused by LC resonance, a parallel snubber is placed at the rear stage, intentionally tuning the Q-factor.
+- Damping resistor: **1Ω × 3 in parallel = 0.33Ω**
+- Snubber capacitor: **22µF × 3 in parallel = 66µF**
+
+This configuration appropriately lowers the filter's Q-factor, suppressing ringing during transient response.
+
+<p align="center">
+  <!-- LTspice simulation image -->
+  <img src="pic/ltspice_simulation.png" alt="LTspice Simulation" width="600"/>
+</p>
+
+### 4. File Structure
+
+| Folder | Contents |
+|--------|----------|
+| `pic/` | Measurement photos, demo GIFs |
+| `EASY_EDA_PRO/` | EasyEDA Pro project files, library files |
+| `JLC_PCB/` | Gerber files, BOM, Pick & Place files |
+| `Datasheet/` | Datasheets of used components |
+| `Firmware/` | SlimeVR open-source-based firmware |
+| `License/` | License files |
+
+### 5. Firmware
+
+All firmware-related portions of this project follow the **[SlimeVR open-source project](https://github.com/SlimeVR/SlimeVR-Tracker-ESP)**.
+
+### 6. Revision History
+
+| Rev | Description |
+|-----|-------------|
+| REV1 | Module-based expansion board design |
+| REV5 | Chip-based redesign (current) |
+
+### 7. License
+
+- **Hardware (PCB, Schematics, 3D files)**: [MIT License](https://github.com/KKSSJJ1112/UNCZ_Slime_tracker/blob/main/License/MIT)
+- **Documentation**: [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
