@@ -1,4 +1,4 @@
-<h1 align="center">🚧 개발중 / 開発中 / Under Development 🚧</h1>
+<h2 align="center">🚧 開発中 / 개발중 / Under Development 🚧</h2>
 
 ---
 
