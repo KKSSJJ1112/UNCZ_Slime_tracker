@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "slimess")(type "KiCad")(uri "${KIPRJMOD}/slimess.kicad_sym")(options "")(descr ""))
+)
